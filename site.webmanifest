@@ -1,0 +1,14 @@
+{
+  "name": "The Promise, Scotland",
+  "short_name": "The Promise",
+  "description": "Scotland made a Promise to children, young people and families in care. These are how we keep it.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#EDE5D3",
+  "theme_color": "#C04A26",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
