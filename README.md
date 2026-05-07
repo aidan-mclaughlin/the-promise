@@ -25,3 +25,4 @@ python3 -m http.server 8000
 ## Deploy
 
 Designed for Netlify. Either drag-and-drop the folder onto Netlify Drop, or connect this repo to Netlify with default settings (no build command, publish directory = repo root).
+
