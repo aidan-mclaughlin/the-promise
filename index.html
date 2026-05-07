@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Promise, Scotland</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter+Tight:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  
+  :root {
+    --paper: #EDE5D3;
+    --paper-deep: #DDD2B8;
+    --ink: #1B1812;
+    --ink-soft: #3A352B;
+    --ink-mute: #7A715F;
+    --rust: #C04A26;
+    --moss: #4A6B3F;
+    --plum: #6B3756;
+    --gold: #C99847;
+    --sky: #486B7A;
+  }
+
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Inter Tight', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+    cursor: default;
+  }
+
+  /* Cursor-following light gradient */
+  .spotlight {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background: radial-gradient(circle 600px at var(--mx, 50%) var(--my, 50%), rgba(192, 74, 38, 0.18), transparent 60%);
+    transition: background 0.2s ease;
+  }
+
+  /* Floating organic shapes */
+  .floating-shapes {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+  .shape {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(70px);
+    opacity: 0.4;
+    animation: float 20s ease-in-out infinite;
+  }
+  .shape-1 {
+    width: 500px; height: 500px;
+    background: var(--rust);
+    top: -100px; left: -150px;
+  }
+  .shape-2 {
+    width: 400px; height: 400px;
+    background: var(--gold);
+    top: 20%; right: -100px;
+    animation-delay: -7s;
+    animation-duration: 28s;
+  }
+  .shape-3 {
+    width: 600px; height: 600px;
+    background: var(--plum);
+    bottom: -200px; left: 20%;
+    animation-delay: -14s;
+    animation-duration: 35s;
+    opacity: 0.3;
+  }
+  .shape-4 {
+    width: 350px; height: 350px;
+    background: var(--moss);
+    top: 50%; left: 10%;
+    animation-delay: -20s;
+    animation-duration: 40s;
+    opacity: 0.25;
+  }
+  @keyframes float {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(80px, -60px) scale(1.1); }
+    66% { transform: translate(-50px, 70px) scale(0.95); }
+  }
+
+  /* Grain */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.92' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+    opacity: 0.08;
+    pointer-events: none;
+    z-index: 1;
+    mix-blend-mode: multiply;
+  }
+
+  /* === HERO === */
+  .hero {
+    position: relative;
+    z-index: 2;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding: 36px clamp(24px, 6vw, 80px) 60px;
+  }
+
+  .top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12vh;
+    font-size: 0.78rem;
+    letter-spacing: 0.05em;
+    color: var(--ink-mute);
+  }
+  .top-mark {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 1.4rem;
+    color: var(--ink);
+    letter-spacing: 0;
+  }
+  .top-mark span { color: var(--rust); }
+  .top-meta {
+    display: flex;
+    gap: 28px;
+    font-size: 0.82rem;
+  }
+  .top-meta span:first-child::after {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    background: var(--moss);
+    border-radius: 50%;
+    margin-left: 10px;
+    vertical-align: middle;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse { 50% { opacity: 0.3; } }
+
+  /* The big display piece */
+  .display {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .display-line {
+    font-family: 'Instrument Serif', serif;
+    font-weight: 400;
+    font-size: clamp(4rem, 14vw, 12rem);
+    line-height: 0.92;
+    letter-spacing: -0.04em;
+    color: var(--ink);
+    display: block;
+  }
+  .display-italic {
+    font-style: italic;
+    color: var(--rust);
+  }
+  .line-2 { padding-left: clamp(60px, 12vw, 200px); }
+  .line-3 { padding-left: clamp(120px, 24vw, 400px); }
+  .line-4 { padding-left: clamp(180px, 36vw, 600px); }
+
+  .display-period {
+    color: var(--rust);
+  }
+
+  .scroll-cue {
+    margin-top: 8vh;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 1.1rem;
+    color: var(--ink-mute);
+    cursor: pointer;
+    transition: color 0.3s, gap 0.3s;
+  }
+  .scroll-cue:hover {
+    color: var(--rust);
+    gap: 24px;
+  }
+  .scroll-cue-arrow {
+    width: 60px;
+    height: 1px;
+    background: var(--ink-mute);
+    position: relative;
+    transition: background 0.3s, width 0.3s;
+  }
+  .scroll-cue:hover .scroll-cue-arrow {
+    background: var(--rust);
+    width: 80px;
+  }
+  .scroll-cue-arrow::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: -3px;
+    width: 8px;
+    height: 8px;
+    border-top: 1px solid currentColor;
+    border-right: 1px solid currentColor;
+    transform: rotate(45deg);
+    color: var(--ink-mute);
+  }
+  .scroll-cue:hover .scroll-cue-arrow::after { color: var(--rust); }
+
+  /* === FOUNDATIONS === */
+  .foundations {
+    position: relative;
+    z-index: 2;
+    padding: 12vh clamp(24px, 6vw, 80px) 12vh;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .section-eyebrow {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 1.2rem;
+    color: var(--rust);
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .section-eyebrow::before {
+    content: '';
+    width: 36px;
+    height: 1px;
+    background: var(--rust);
+  }
+
+  .section-title {
+    font-family: 'Instrument Serif', serif;
+    font-weight: 400;
+    font-size: clamp(2.6rem, 6vw, 4.5rem);
+    line-height: 0.98;
+    letter-spacing: -0.025em;
+    margin-bottom: 60px;
+    max-width: 800px;
+  }
+  .section-title em {
+    font-style: italic;
+    color: var(--rust);
+  }
+
+  .foundations-stack {
+    display: flex;
+    flex-direction: column;
+  }
+  .foundation-item {
+    display: grid;
+    grid-template-columns: 100px 1fr auto;
+    gap: 32px;
+    align-items: center;
+    padding: 32px 0;
+    border-bottom: 1px solid rgba(27, 24, 18, 0.15);
+    cursor: pointer;
+    transition: padding-left 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+    position: relative;
+  }
+  .foundation-item:first-child { border-top: 1px solid rgba(27, 24, 18, 0.15); }
+  .foundation-item:hover {
+    padding-left: 24px;
+  }
+  .foundation-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--rust);
+    transform: scaleY(0);
+    transform-origin: center;
+    transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  .foundation-item:hover::before { transform: scaleY(1); }
+
+  .foundation-num {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 2.4rem;
+    color: var(--ink-mute);
+    line-height: 1;
+    transition: color 0.3s;
+  }
+  .foundation-item:hover .foundation-num { color: var(--rust); }
+
+  .foundation-name {
+    font-family: 'Instrument Serif', serif;
+    font-weight: 400;
+    font-size: clamp(2rem, 4vw, 3.4rem);
+    line-height: 1;
+    letter-spacing: -0.02em;
+    transition: color 0.3s;
+  }
+  .foundation-item:hover .foundation-name { color: var(--rust); }
+
+  .foundation-blurb {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 1.05rem;
+    color: var(--ink-mute);
+    text-align: right;
+    max-width: 360px;
+    line-height: 1.4;
+    opacity: 0;
+    transform: translateX(-20px);
+    transition: opacity 0.4s, transform 0.4s;
+  }
+  .foundation-item:hover .foundation-blurb {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  /* === CARDS === */
+  .pages-section {
+    position: relative;
+    z-index: 2;
+    padding: 8vh clamp(24px, 6vw, 80px) 12vh;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .pages-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+
+  .page-card {
+    position: relative;
+    text-decoration: none;
+    color: inherit;
+    padding: 40px 32px 36px;
+    border-radius: 24px;
+    overflow: hidden;
+    transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    min-height: 480px;
+  }
+  .page-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--card-tint, transparent);
+    opacity: 0;
+    transition: opacity 0.5s;
+    z-index: -1;
+  }
+  .page-card:hover {
+    transform: translateY(-8px);
+  }
+  .page-card:hover::before {
+    opacity: 0.15;
+  }
+
+  .page-card-younger { --card-tint: var(--rust); }
+  .page-card-teens { --card-tint: var(--plum); }
+  .page-card-staff { --card-tint: var(--moss); }
+
+  .page-card-num {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 1.05rem;
+    color: var(--ink-mute);
+    margin-bottom: 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .page-card-num-tag {
+    font-family: 'Inter Tight', sans-serif;
+    font-style: normal;
+    font-size: 0.72rem;
+    color: var(--ink-mute);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .page-card-art {
+    height: 140px;
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.5s;
+  }
+  .page-card:hover .page-card-art {
+    transform: scale(1.05) rotate(-2deg);
+  }
+
+  .page-card-title {
+    font-family: 'Instrument Serif', serif;
+    font-weight: 400;
+    font-size: 2.4rem;
+    line-height: 0.98;
+    letter-spacing: -0.025em;
+    margin-bottom: 8px;
+    color: var(--ink);
+  }
+  .page-card-title em {
+    font-style: italic;
+  }
+  .page-card-younger .page-card-title em { color: var(--rust); }
+  .page-card-teens .page-card-title em { color: var(--plum); }
+  .page-card-staff .page-card-title em { color: var(--moss); }
+
+  .page-card-for {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 1.05rem;
+    color: var(--ink-mute);
+    margin-bottom: 20px;
+  }
+
+  .page-card-desc {
+    font-size: 0.95rem;
+    line-height: 1.55;
+    color: var(--ink-soft);
+    margin-bottom: 32px;
+    flex: 1;
+  }
+
+  .page-card-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 1.25rem;
+    color: var(--ink);
+    transition: gap 0.3s, color 0.3s;
+  }
+  .page-card-cta-arrow {
+    font-style: normal;
+    font-family: 'Inter Tight', sans-serif;
+    font-size: 1.4rem;
+    transition: transform 0.3s;
+  }
+  .page-card:hover .page-card-cta { gap: 20px; }
+  .page-card-younger:hover .page-card-cta { color: var(--rust); }
+  .page-card-teens:hover .page-card-cta { color: var(--plum); }
+  .page-card-staff:hover .page-card-cta { color: var(--moss); }
+  .page-card:hover .page-card-cta-arrow { transform: translateX(6px); }
+
+  /* === CLOSING NOTE === */
+  .closing {
+    position: relative;
+    z-index: 2;
+    padding: 12vh clamp(24px, 6vw, 80px) 6vh;
+    max-width: 920px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .closing-quote {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: clamp(1.6rem, 3.5vw, 2.6rem);
+    line-height: 1.3;
+    color: var(--ink);
+    margin-bottom: 32px;
+  }
+  .closing-quote em { color: var(--rust); }
+
+  .closing-attr {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    color: var(--ink-mute);
+    font-size: 1rem;
+  }
+
+  .closing-divider {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    color: var(--rust);
+    font-size: 1.4rem;
+    margin: 60px 0 40px;
+    letter-spacing: 1em;
+    opacity: 0.6;
+  }
+
+  /* === FOOTER === */
+  .footer {
+    position: relative;
+    z-index: 2;
+    padding: 32px clamp(24px, 6vw, 80px);
+    border-top: 1px solid rgba(27, 24, 18, 0.15);
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 16px;
+    font-size: 0.85rem;
+    color: var(--ink-mute);
+  }
+  .footer-mark {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 1.05rem;
+    color: var(--ink);
+  }
+  .footer-mark em { color: var(--rust); }
+  .footer a {
+    color: var(--rust);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.2s;
+  }
+  .footer a:hover { border-bottom-color: var(--rust); }
+
+  /* Responsive */
+  @media (max-width: 980px) {
+    .pages-grid { grid-template-columns: 1fr; }
+    .page-card { min-height: auto; }
+    .foundation-item {
+      grid-template-columns: 60px 1fr;
+      gap: 20px;
+    }
+    .foundation-blurb {
+      grid-column: 1 / -1;
+      text-align: left;
+      opacity: 1;
+      transform: none;
+      max-width: 100%;
+      margin-top: 8px;
+    }
+  }
+  @media (max-width: 640px) {
+    .top-meta { display: none; }
+    .top-bar { margin-bottom: 8vh; }
+    .line-2 { padding-left: 30px; }
+    .line-3 { padding-left: 60px; }
+    .line-4 { padding-left: 90px; }
+  }
+
+  ::selection { background: var(--rust); color: var(--paper); }
+</style>
+</head>
+<body>
+
+<div class="spotlight" id="spotlight"></div>
+
+<div class="floating-shapes">
+  <div class="shape shape-1"></div>
+  <div class="shape shape-2"></div>
+  <div class="shape shape-3"></div>
+  <div class="shape shape-4"></div>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="top-bar">
+    <div class="top-mark">The <span>Promise</span></div>
+    <div class="top-meta">
+      <span>Active</span>
+      <span>Scotland, 2024 to 2030</span>
+    </div>
+  </div>
+
+  <div class="display">
+    <span class="display-line">Scotland</span>
+    <span class="display-line line-2">made <em class="display-italic">a</em></span>
+    <span class="display-line line-3"><em class="display-italic">promise<span class="display-period">.</span></em></span>
+    <span class="display-line line-4">these are how</span>
+    <span class="display-line line-4"><em class="display-italic">we keep it.</em></span>
+
+    <div class="scroll-cue" onclick="document.querySelector('.foundations').scrollIntoView({behavior: 'smooth'})">
+      <span class="scroll-cue-arrow"></span>
+      <span>begin</span>
+    </div>
+  </div>
+</section>
+
+<!-- FOUNDATIONS -->
+<section class="foundations">
+  <div class="section-eyebrow">five foundations</div>
+  <h2 class="section-title">What <em>The Promise</em> rests on.</h2>
+
+  <div class="foundations-stack">
+    <div class="foundation-item">
+      <div class="foundation-num">01</div>
+      <div class="foundation-name">Voice</div>
+      <div class="foundation-blurb">Children meaningfully heard in decisions about their care.</div>
+    </div>
+    <div class="foundation-item">
+      <div class="foundation-num">02</div>
+      <div class="foundation-name">Family</div>
+      <div class="foundation-blurb">Families supported to stay together safely.</div>
+    </div>
+    <div class="foundation-item">
+      <div class="foundation-num">03</div>
+      <div class="foundation-name">Care</div>
+      <div class="foundation-blurb">When care is needed, it must feel like a loving home.</div>
+    </div>
+    <div class="foundation-item">
+      <div class="foundation-num">04</div>
+      <div class="foundation-name">People</div>
+      <div class="foundation-blurb">A workforce supported to build lasting relationships.</div>
+    </div>
+    <div class="foundation-item">
+      <div class="foundation-num">05</div>
+      <div class="foundation-name">Scaffolding</div>
+      <div class="foundation-blurb">A wider system of help, ready and joined up.</div>
+    </div>
+  </div>
+</section>
+
+<!-- PAGES -->
+<section class="pages-section">
+  <div class="section-eyebrow">three pages, one promise</div>
+  <h2 class="section-title">Choose <em>your way in</em>.</h2>
+
+  <div class="pages-grid">
+
+    <a href="promise-quest.html" class="page-card page-card-younger">
+      <div class="page-card-num">
+        <span>No. 01</span>
+        <span class="page-card-num-tag">10 min, 5 stops</span>
+      </div>
+      <div class="page-card-art">
+        <svg viewBox="0 0 200 140" width="200" height="140">
+          <path d="M0,110 Q50,80 100,90 T200,100 L200,140 L0,140 Z" fill="#C04A26" opacity="0.85"/>
+          <circle cx="160" cy="32" r="22" fill="#C99847"/>
+          <path d="M30,115 Q70,100 110,105 T180,108" fill="none" stroke="#1B1812" stroke-width="1.5" stroke-dasharray="3,4"/>
+          <circle cx="40" cy="113" r="6" fill="#EDE5D3" stroke="#1B1812" stroke-width="1.5"/>
+          <circle cx="80" cy="105" r="6" fill="#EDE5D3" stroke="#1B1812" stroke-width="1.5"/>
+          <circle cx="120" cy="103" r="6" fill="#EDE5D3" stroke="#1B1812" stroke-width="1.5"/>
+          <circle cx="155" cy="106" r="6" fill="#EDE5D3" stroke="#1B1812" stroke-width="1.5"/>
+          <circle cx="180" cy="108" r="7" fill="#C04A26" stroke="#1B1812" stroke-width="1.5"/>
+          <path d="M180 100 L182 105 L187 105 L183 108 L184 113 L180 110 L176 113 L177 108 L173 105 L178 105 Z" fill="#EDE5D3" stroke="#1B1812" stroke-width="0.8"/>
+        </svg>
+      </div>
+      <h3 class="page-card-title">The <em>Promise Quest</em></h3>
+      <div class="page-card-for">for ages 7 to 11</div>
+      <p class="page-card-desc">A playful map journey through the five Foundations. Stickers, simple choices, and a printable certificate at the end.</p>
+      <span class="page-card-cta">open the quest <span class="page-card-cta-arrow">→</span></span>
+    </a>
+
+    <a href="the-promise-teens.html" class="page-card page-card-teens">
+      <div class="page-card-num">
+        <span>No. 02</span>
+        <span class="page-card-num-tag">12 min, 5 sections</span>
+      </div>
+      <div class="page-card-art">
+        <svg viewBox="0 0 200 140" width="200" height="140">
+          <path d="M20,38 Q20,22 36,22 L92,22 Q108,22 108,38 L108,66 Q108,82 92,82 L58,82 L46,94 L50,82 L36,82 Q20,82 20,66 Z" fill="#EDE5D3" stroke="#1B1812" stroke-width="1.8"/>
+          <path d="M88,52 Q88,36 104,36 L168,36 Q184,36 184,52 L184,84 Q184,100 168,100 L132,100 L144,114 L120,100 L104,100 Q88,100 88,84 Z" fill="#6B3756"/>
+          <line x1="32" y1="40" x2="96" y2="40" stroke="#1B1812" stroke-width="1.4" stroke-linecap="round"/>
+          <line x1="32" y1="50" x2="84" y2="50" stroke="#1B1812" stroke-width="1.4" stroke-linecap="round"/>
+          <line x1="32" y1="60" x2="92" y2="60" stroke="#1B1812" stroke-width="1.4" stroke-linecap="round"/>
+          <line x1="100" y1="56" x2="172" y2="56" stroke="#EDE5D3" stroke-width="1.4" stroke-linecap="round"/>
+          <line x1="100" y1="68" x2="160" y2="68" stroke="#EDE5D3" stroke-width="1.4" stroke-linecap="round"/>
+          <line x1="100" y1="80" x2="174" y2="80" stroke="#EDE5D3" stroke-width="1.4" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <h3 class="page-card-title">Have <em>Your Say</em></h3>
+      <div class="page-card-for">for ages 12 to 18</div>
+      <p class="page-card-desc">Honest, no jargon. A short quiz at each Foundation, plus three big open questions where what you write actually goes somewhere.</p>
+      <span class="page-card-cta">open the page <span class="page-card-cta-arrow">→</span></span>
+    </a>
+
+    <a href="keeping-the-promise-staff.html" class="page-card page-card-staff">
+      <div class="page-card-num">
+        <span>No. 03</span>
+        <span class="page-card-num-tag">25 min, generates PDF</span>
+      </div>
+      <div class="page-card-art">
+        <svg viewBox="0 0 200 140" width="200" height="140">
+          <rect x="38" y="18" width="100" height="118" fill="#EDE5D3" stroke="#1B1812" stroke-width="1.8"/>
+          <rect x="38" y="18" width="100" height="20" fill="#4A6B3F"/>
+          <line x1="48" y1="28" x2="105" y2="28" stroke="#EDE5D3" stroke-width="1.4" stroke-linecap="round"/>
+          <line x1="48" y1="50" x2="118" y2="50" stroke="#1B1812" stroke-width="1.4" stroke-linecap="round"/>
+          <line x1="48" y1="58" x2="113" y2="58" stroke="#7A715F" stroke-width="1" stroke-linecap="round"/>
+          <line x1="48" y1="65" x2="123" y2="65" stroke="#7A715F" stroke-width="1" stroke-linecap="round"/>
+          <circle cx="53" cy="80" r="3" fill="#4A6B3F"/>
+          <line x1="60" y1="80" x2="113" y2="80" stroke="#1B1812" stroke-width="1.4" stroke-linecap="round"/>
+          <circle cx="53" cy="92" r="3" fill="#4A6B3F"/>
+          <line x1="60" y1="92" x2="123" y2="92" stroke="#1B1812" stroke-width="1.4" stroke-linecap="round"/>
+          <circle cx="53" cy="104" r="3" fill="#4A6B3F"/>
+          <line x1="60" y1="104" x2="118" y2="104" stroke="#1B1812" stroke-width="1.4" stroke-linecap="round"/>
+          <circle cx="53" cy="116" r="3" fill="#C04A26"/>
+          <line x1="60" y1="116" x2="116" y2="116" stroke="#1B1812" stroke-width="1.4" stroke-linecap="round"/>
+          <line x1="153" y1="55" x2="170" y2="38" stroke="#1B1812" stroke-width="2" stroke-linecap="round"/>
+          <polygon points="151,57 156,52 159,55 154,60" fill="#C04A26" stroke="#1B1812" stroke-width="1.2"/>
+        </svg>
+      </div>
+      <h3 class="page-card-title">Keeping <em>The Promise</em></h3>
+      <div class="page-card-for">for staff &amp; practitioners</div>
+      <p class="page-card-desc">A reflective practice module. Knowledge checks, real scenarios, honest self-assessment, and a personal pledge to take away.</p>
+      <span class="page-card-cta">begin the module <span class="page-card-cta-arrow">→</span></span>
+    </a>
+
+  </div>
+</section>
+
+<!-- CLOSING -->
+<section class="closing">
+  <p class="closing-quote">Children must be <em>meaningfully and appropriately involved</em> when decisions are made about their care.</p>
+  <p class="closing-attr">The Promise, 2020</p>
+  <div class="closing-divider">✷ ✷ ✷</div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-mark">Built for the work of keeping <em>The Promise</em>.</div>
+  <div>More on The Promise: <a href="https://thepromise.scot" target="_blank">thepromise.scot</a></div>
+</footer>
+
+<script>
+  // Cursor-following spotlight
+  const spotlight = document.getElementById('spotlight');
+  let mx = 50, my = 50;
+  let tx = 50, ty = 50;
+  
+  document.addEventListener('mousemove', (e) => {
+    tx = (e.clientX / window.innerWidth) * 100;
+    ty = (e.clientY / window.innerHeight) * 100;
+  });
+
+  function tick() {
+    mx += (tx - mx) * 0.08;
+    my += (ty - my) * 0.08;
+    spotlight.style.setProperty('--mx', mx + '%');
+    spotlight.style.setProperty('--my', my + '%');
+    requestAnimationFrame(tick);
+  }
+  tick();
+</script>
+
+</body>
+</html>

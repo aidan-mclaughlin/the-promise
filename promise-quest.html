@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Promise Quest — A Journey Through The Five Foundations</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,800;9..144,900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  
+  :root {
+    --sky: #FFE5B4;
+    --sky-deep: #FFD089;
+    --sun: #FF8C42;
+    --coral: #FF6B6B;
+    --mint: #6BCB77;
+    --teal: #4D96A9;
+    --berry: #9B5DE5;
+    --cream: #FFF8E7;
+    --ink: #2D3047;
+    --shadow: rgba(45, 48, 71, 0.15);
+  }
+
+  html, body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body {
+    background: 
+      radial-gradient(circle at 20% 10%, #FFE5B4 0%, transparent 40%),
+      radial-gradient(circle at 80% 80%, #C8E6C9 0%, transparent 40%),
+      radial-gradient(circle at 50% 50%, #FFD089 0%, transparent 60%),
+      var(--cream);
+  }
+
+  /* Floating decorative shapes */
+  .deco {
+    position: fixed;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.6;
+  }
+  .deco-cloud-1 { top: 8%; left: 5%; width: 80px; animation: float 8s ease-in-out infinite; }
+  .deco-cloud-2 { top: 15%; right: 8%; width: 100px; animation: float 10s ease-in-out infinite reverse; }
+  .deco-star-1 { top: 30%; left: 8%; animation: twinkle 3s ease-in-out infinite; }
+  .deco-star-2 { bottom: 20%; right: 10%; animation: twinkle 4s ease-in-out infinite; }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0) translateX(0); }
+    50% { transform: translateY(-20px) translateX(10px); }
+  }
+  @keyframes twinkle {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(1.2); }
+  }
+
+  .stage {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+
+  .scene {
+    width: 100%;
+    max-width: 760px;
+    background: white;
+    border-radius: 32px;
+    box-shadow: 0 20px 60px var(--shadow), 0 4px 12px rgba(0,0,0,0.05);
+    padding: 48px;
+    position: relative;
+    border: 4px solid var(--ink);
+  }
+
+  /* Progress bar */
+  .progress-bar {
+    position: absolute;
+    top: -20px;
+    left: 48px;
+    right: 48px;
+    height: 16px;
+    background: white;
+    border: 3px solid var(--ink);
+    border-radius: 20px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--coral), var(--sun), var(--mint), var(--teal), var(--berry));
+    width: 0%;
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 20px;
+  }
+
+  /* Hide all scenes by default */
+  .scene-content { display: none; animation: bounceIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  .scene-content.active { display: block; }
+
+  @keyframes bounceIn {
+    0% { opacity: 0; transform: scale(0.8) translateY(20px); }
+    100% { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  h1.title {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: clamp(2.4rem, 6vw, 4rem);
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+    text-align: center;
+    margin-bottom: 16px;
+  }
+  h1.title .word-1 { color: var(--coral); display: inline-block; transform: rotate(-3deg); }
+  h1.title .word-2 { color: var(--berry); display: inline-block; }
+  h1.title .word-3 { color: var(--teal); display: inline-block; transform: rotate(2deg); }
+
+  .subtitle {
+    text-align: center;
+    font-size: 1.15rem;
+    color: var(--ink);
+    margin-bottom: 32px;
+    line-height: 1.5;
+    opacity: 0.85;
+  }
+
+  .hero-illo {
+    margin: 0 auto 24px;
+    display: block;
+    width: 100%;
+    max-width: 360px;
+  }
+
+  /* Buttons */
+  .btn {
+    display: inline-block;
+    padding: 16px 32px;
+    background: var(--coral);
+    color: white;
+    border: 3px solid var(--ink);
+    border-radius: 16px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 1.1rem;
+    cursor: pointer;
+    box-shadow: 0 6px 0 var(--ink);
+    transition: all 0.15s ease;
+    text-decoration: none;
+  }
+  .btn:hover {
+    transform: translateY(2px);
+    box-shadow: 0 4px 0 var(--ink);
+  }
+  .btn:active {
+    transform: translateY(6px);
+    box-shadow: 0 0 0 var(--ink);
+  }
+  .btn-mint { background: var(--mint); }
+  .btn-teal { background: var(--teal); }
+  .btn-berry { background: var(--berry); }
+  .btn-sun { background: var(--sun); }
+
+  .btn-row {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 24px;
+  }
+
+  /* Foundation cards */
+  .foundation-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 24px;
+  }
+  .foundation-emoji {
+    width: 80px;
+    height: 80px;
+    border-radius: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    border: 3px solid var(--ink);
+    flex-shrink: 0;
+  }
+  .foundation-title {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: 2.5rem;
+    line-height: 1;
+  }
+  .foundation-tag {
+    display: inline-block;
+    background: var(--ink);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 4px;
+  }
+
+  .foundation-text {
+    font-size: 1.2rem;
+    line-height: 1.6;
+    margin-bottom: 24px;
+  }
+  .foundation-text strong { 
+    background: linear-gradient(120deg, transparent 0%, transparent 30%, #FFE066 30%, #FFE066 95%, transparent 95%);
+    padding: 0 4px;
+    font-weight: 800;
+  }
+
+  .think-box {
+    background: var(--cream);
+    border: 3px dashed var(--ink);
+    border-radius: 20px;
+    padding: 24px;
+    margin: 24px 0;
+  }
+  .think-box-title {
+    font-family: 'Fraunces', serif;
+    font-weight: 800;
+    font-size: 1.3rem;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  /* Input */
+  .text-input, textarea {
+    width: 100%;
+    padding: 14px 18px;
+    border: 3px solid var(--ink);
+    border-radius: 14px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.05rem;
+    background: white;
+    color: var(--ink);
+    resize: vertical;
+  }
+  .text-input:focus, textarea:focus {
+    outline: none;
+    box-shadow: 0 0 0 4px var(--sun);
+  }
+  textarea { min-height: 100px; }
+
+  /* Choice buttons */
+  .choice-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin: 16px 0;
+  }
+  .choice {
+    padding: 16px;
+    background: white;
+    border: 3px solid var(--ink);
+    border-radius: 14px;
+    cursor: pointer;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    text-align: left;
+    transition: all 0.2s;
+    color: var(--ink);
+  }
+  .choice:hover { background: var(--sky); transform: translateY(-2px); }
+  .choice.selected { background: var(--mint); color: white; }
+
+  /* Sticker reward */
+  .sticker {
+    display: inline-block;
+    padding: 12px 20px;
+    background: var(--sun);
+    color: white;
+    border: 3px solid var(--ink);
+    border-radius: 50px;
+    font-weight: 800;
+    font-size: 1.1rem;
+    margin: 8px;
+    transform: rotate(-2deg);
+    box-shadow: 0 4px 0 var(--ink);
+  }
+  .sticker:nth-child(2) { transform: rotate(2deg); background: var(--mint); }
+  .sticker:nth-child(3) { transform: rotate(-1deg); background: var(--berry); }
+  .sticker:nth-child(4) { transform: rotate(3deg); background: var(--teal); }
+  .sticker:nth-child(5) { transform: rotate(-3deg); background: var(--coral); }
+
+  .sticker-row {
+    text-align: center;
+    margin: 24px 0;
+  }
+
+  /* Map view */
+  .map-container {
+    position: relative;
+    background: linear-gradient(135deg, #C8E6C9 0%, #FFE5B4 100%);
+    border: 3px solid var(--ink);
+    border-radius: 24px;
+    padding: 40px 20px;
+    margin: 24px 0;
+    min-height: 320px;
+  }
+  .map-path {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .map-stop {
+    position: relative;
+    z-index: 2;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: white;
+    border: 4px solid var(--ink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    font-weight: 900;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 0 var(--ink);
+  }
+  .map-stop.done { background: var(--mint); color: white; }
+  .map-stop.current { background: var(--sun); color: white; animation: pulse 1.5s ease-in-out infinite; }
+  .map-stop.locked { opacity: 0.4; cursor: not-allowed; }
+  
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+  }
+
+  .map-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
+    align-items: center;
+    justify-items: center;
+  }
+  .map-stop-wrap {
+    text-align: center;
+  }
+  .map-label {
+    margin-top: 8px;
+    font-weight: 800;
+    font-size: 0.85rem;
+  }
+
+  .quote-card {
+    background: var(--sky);
+    border: 3px solid var(--ink);
+    border-radius: 20px;
+    padding: 20px;
+    margin: 20px 0;
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 1.15rem;
+    line-height: 1.5;
+    position: relative;
+  }
+  .quote-card::before {
+    content: '"';
+    position: absolute;
+    top: -20px;
+    left: 16px;
+    font-size: 4rem;
+    font-family: 'Fraunces', serif;
+    color: var(--coral);
+    line-height: 1;
+  }
+
+  /* Final certificate */
+  .certificate {
+    background: linear-gradient(135deg, #FFF8E7 0%, #FFE5B4 100%);
+    border: 4px solid var(--ink);
+    border-radius: 24px;
+    padding: 40px;
+    text-align: center;
+    margin: 24px 0;
+    position: relative;
+  }
+  .cert-corner {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    border: 3px solid var(--ink);
+  }
+  .cert-corner-tl { top: 12px; left: 12px; border-right: none; border-bottom: none; }
+  .cert-corner-tr { top: 12px; right: 12px; border-left: none; border-bottom: none; }
+  .cert-corner-bl { bottom: 12px; left: 12px; border-right: none; border-top: none; }
+  .cert-corner-br { bottom: 12px; right: 12px; border-left: none; border-top: none; }
+
+  .cert-name {
+    font-family: 'Fraunces', serif;
+    font-weight: 800;
+    font-size: 2rem;
+    color: var(--berry);
+    margin: 12px 0;
+    border-bottom: 2px dashed var(--ink);
+    padding-bottom: 8px;
+  }
+
+  .small-text {
+    font-size: 0.85rem;
+    opacity: 0.7;
+    text-align: center;
+    margin-top: 16px;
+  }
+
+  /* Confetti */
+  .confetti {
+    position: fixed;
+    width: 10px;
+    height: 10px;
+    pointer-events: none;
+    animation: fall 3s linear forwards;
+    z-index: 100;
+  }
+  @keyframes fall {
+    to { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+  }
+
+  @media (max-width: 600px) {
+    .scene { padding: 32px 24px; border-radius: 24px; }
+    .progress-bar { left: 24px; right: 24px; }
+    .foundation-title { font-size: 1.8rem; }
+    .foundation-emoji { width: 60px; height: 60px; font-size: 2rem; }
+    .map-grid { grid-template-columns: repeat(5, 1fr); gap: 4px; }
+    .map-stop { width: 56px; height: 56px; font-size: 1.3rem; }
+    .map-label { font-size: 0.7rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Decorative SVG shapes -->
+<svg class="deco deco-cloud-1" viewBox="0 0 100 60" fill="white" stroke="#2D3047" stroke-width="3">
+  <ellipse cx="30" cy="40" rx="22" ry="15"/>
+  <ellipse cx="55" cy="32" rx="25" ry="18"/>
+  <ellipse cx="78" cy="42" rx="18" ry="13"/>
+</svg>
+<svg class="deco deco-cloud-2" viewBox="0 0 100 60" fill="white" stroke="#2D3047" stroke-width="3">
+  <ellipse cx="30" cy="40" rx="22" ry="15"/>
+  <ellipse cx="55" cy="32" rx="25" ry="18"/>
+  <ellipse cx="78" cy="42" rx="18" ry="13"/>
+</svg>
+<svg class="deco deco-star-1" width="40" height="40" viewBox="0 0 40 40" fill="#FF8C42" stroke="#2D3047" stroke-width="2">
+  <path d="M20 4 L24 16 L36 16 L26 24 L30 36 L20 28 L10 36 L14 24 L4 16 L16 16 Z"/>
+</svg>
+<svg class="deco deco-star-2" width="50" height="50" viewBox="0 0 40 40" fill="#9B5DE5" stroke="#2D3047" stroke-width="2">
+  <path d="M20 4 L24 16 L36 16 L26 24 L30 36 L20 28 L10 36 L14 24 L4 16 L16 16 Z"/>
+</svg>
+
+<div class="stage">
+  <div class="scene">
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+
+    <!-- SCENE 0: WELCOME -->
+    <div class="scene-content active" id="scene-0">
+      <h1 class="title">
+        <span class="word-1">The</span>
+        <span class="word-2">Promise</span>
+        <span class="word-3">Quest!</span>
+      </h1>
+      <p class="subtitle">An adventure through Scotland's Promise — and a chance for YOU to be heard.</p>
+      
+      <svg class="hero-illo" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg">
+        <!-- Hill -->
+        <path d="M0,200 Q90,140 180,160 T360,180 L360,240 L0,240 Z" fill="#6BCB77" stroke="#2D3047" stroke-width="3"/>
+        <!-- Sun -->
+        <circle cx="290" cy="60" r="32" fill="#FF8C42" stroke="#2D3047" stroke-width="3"/>
+        <line x1="290" y1="10" x2="290" y2="20" stroke="#2D3047" stroke-width="3" stroke-linecap="round"/>
+        <line x1="290" y1="100" x2="290" y2="110" stroke="#2D3047" stroke-width="3" stroke-linecap="round"/>
+        <line x1="240" y1="60" x2="250" y2="60" stroke="#2D3047" stroke-width="3" stroke-linecap="round"/>
+        <line x1="330" y1="60" x2="340" y2="60" stroke="#2D3047" stroke-width="3" stroke-linecap="round"/>
+        <!-- Castle -->
+        <rect x="60" y="120" width="80" height="60" fill="#9B5DE5" stroke="#2D3047" stroke-width="3"/>
+        <polygon points="60,120 70,100 80,120" fill="#FF6B6B" stroke="#2D3047" stroke-width="3"/>
+        <polygon points="120,120 130,100 140,120" fill="#FF6B6B" stroke="#2D3047" stroke-width="3"/>
+        <rect x="92" y="145" width="16" height="35" fill="#2D3047"/>
+        <!-- Path -->
+        <path d="M180,200 Q220,180 260,200" fill="none" stroke="#FFF8E7" stroke-width="6" stroke-dasharray="8,8"/>
+        <!-- Friend -->
+        <circle cx="220" cy="160" r="14" fill="#FFE5B4" stroke="#2D3047" stroke-width="3"/>
+        <circle cx="216" cy="158" r="2" fill="#2D3047"/>
+        <circle cx="224" cy="158" r="2" fill="#2D3047"/>
+        <path d="M216,164 Q220,167 224,164" stroke="#2D3047" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <rect x="210" y="173" width="20" height="22" fill="#4D96A9" stroke="#2D3047" stroke-width="3" rx="3"/>
+      </svg>
+
+      <p style="text-align:center; font-size: 1.1rem; line-height: 1.6; margin-bottom: 20px;">
+        Scotland made a <strong style="background: #FFE066; padding: 0 4px;">promise</strong> to all children — that they will grow up <strong style="color: var(--coral);">loved</strong>, <strong style="color: var(--mint);">safe</strong> and <strong style="color: var(--berry);">respected</strong>.
+      </p>
+      <p style="text-align:center; font-size: 1.05rem; line-height: 1.6;">
+        Visit 5 magical places. Collect 5 stickers. And tell us what YOU think! 🌟
+      </p>
+      
+      <div class="btn-row">
+        <button class="btn btn-coral" onclick="goToScene(1)">Start the Quest! →</button>
+      </div>
+      <p class="small-text">For ages 7–11 · Takes about 10 minutes</p>
+    </div>
+
+    <!-- SCENE 1: NAME -->
+    <div class="scene-content" id="scene-1">
+      <h2 style="font-family: 'Fraunces', serif; font-size: 2rem; text-align: center; margin-bottom: 16px;">First, what should we call you?</h2>
+      <p style="text-align: center; margin-bottom: 24px;">A name, nickname, or anything you like — we just want to say hi! 👋</p>
+      <input type="text" id="userName" class="text-input" placeholder="Type a name here..." maxlength="30">
+      <div class="btn-row">
+        <button class="btn btn-mint" onclick="saveNameAndGo()">Let's go! →</button>
+      </div>
+    </div>
+
+    <!-- SCENE 2: MAP -->
+    <div class="scene-content" id="scene-2">
+      <h2 style="font-family: 'Fraunces', serif; font-size: 2rem; text-align: center; margin-bottom: 8px;">Hi <span id="greetName" style="color: var(--berry);"></span>! 🎉</h2>
+      <p style="text-align: center; margin-bottom: 16px;">Here's your map. Each stop is one of <strong>The Five Foundations</strong> of The Promise.</p>
+      
+      <div class="map-container">
+        <div class="map-grid" id="mapGrid">
+          <div class="map-stop-wrap">
+            <div class="map-stop current" id="map-stop-0" onclick="goToFoundation(0)">📣</div>
+            <div class="map-label">Voice</div>
+          </div>
+          <div class="map-stop-wrap">
+            <div class="map-stop locked" id="map-stop-1">👨‍👩‍👧</div>
+            <div class="map-label">Family</div>
+          </div>
+          <div class="map-stop-wrap">
+            <div class="map-stop locked" id="map-stop-2">💛</div>
+            <div class="map-label">Care</div>
+          </div>
+          <div class="map-stop-wrap">
+            <div class="map-stop locked" id="map-stop-3">🤝</div>
+            <div class="map-label">People</div>
+          </div>
+          <div class="map-stop-wrap">
+            <div class="map-stop locked" id="map-stop-4">🏗️</div>
+            <div class="map-label">Scaffolding</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sticker-row" id="stickerRow"></div>
+
+      <div class="btn-row">
+        <button class="btn btn-coral" onclick="startFoundation()">Visit the next stop! →</button>
+      </div>
+    </div>
+
+    <!-- SCENE 3: VOICE -->
+    <div class="scene-content" id="scene-3">
+      <div class="foundation-header">
+        <div class="foundation-emoji" style="background: #FFE066;">📣</div>
+        <div>
+          <span class="foundation-tag">Foundation 1 of 5</span>
+          <h2 class="foundation-title" style="color: var(--coral);">Voice</h2>
+        </div>
+      </div>
+      <p class="foundation-text">
+        Your <strong>voice matters</strong>. Grown-ups should listen to children when they make decisions about their care. That means asking, listening properly, and doing something about what you say.
+      </p>
+      <div class="quote-card">
+        Children must be heard in all of the decisions about their care.
+      </div>
+      <div class="think-box">
+        <div class="think-box-title">💭 Your turn!</div>
+        <p style="margin-bottom: 12px;">When grown-ups make decisions that affect you, do they listen?</p>
+        <div class="choice-grid">
+          <button class="choice" onclick="pickChoice(this, 'voice', 'Always')">😊 Yes, always</button>
+          <button class="choice" onclick="pickChoice(this, 'voice', 'Sometimes')">🤔 Sometimes</button>
+          <button class="choice" onclick="pickChoice(this, 'voice', 'Not really')">😐 Not really</button>
+          <button class="choice" onclick="pickChoice(this, 'voice', 'Not sure')">🤷 Not sure</button>
+        </div>
+        <p style="margin-top: 16px; margin-bottom: 8px;">If you could tell grown-ups one thing about how to listen better, what would it be? <em>(You can skip this!)</em></p>
+        <textarea id="voiceText" placeholder="Type here... or leave it blank"></textarea>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-coral" onclick="completeFoundation(0)">I've finished this stop! ⭐</button>
+      </div>
+    </div>
+
+    <!-- SCENE 4: FAMILY -->
+    <div class="scene-content" id="scene-4">
+      <div class="foundation-header">
+        <div class="foundation-emoji" style="background: #FFCDD2;">👨‍👩‍👧</div>
+        <div>
+          <span class="foundation-tag">Foundation 2 of 5</span>
+          <h2 class="foundation-title" style="color: var(--berry);">Family</h2>
+        </div>
+      </div>
+      <p class="foundation-text">
+        Children should be able to <strong>stay with their family</strong> whenever it is safe to do so. If they can't, they should still keep close to brothers, sisters, and people they love.
+      </p>
+      <div class="quote-card">
+        Where children are safe in their families and feel loved, they must stay— and families must be given support together to nurture that love.
+      </div>
+      <div class="think-box">
+        <div class="think-box-title">💭 Your turn!</div>
+        <p style="margin-bottom: 12px;">Who are the people who feel like family to you? <em>(They don't have to be related!)</em></p>
+        <textarea id="familyText" placeholder="Maybe a parent, a brother or sister, a carer, a friend, a pet..."></textarea>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-berry" onclick="completeFoundation(1)">I've finished this stop! ⭐</button>
+      </div>
+    </div>
+
+    <!-- SCENE 5: CARE -->
+    <div class="scene-content" id="scene-5">
+      <div class="foundation-header">
+        <div class="foundation-emoji" style="background: #FFE5B4;">💛</div>
+        <div>
+          <span class="foundation-tag">Foundation 3 of 5</span>
+          <h2 class="foundation-title" style="color: var(--sun);">Care</h2>
+        </div>
+      </div>
+      <p class="foundation-text">
+        When children need care, it must be <strong>full of love</strong>. They should feel safe, happy, and able to grow up with people who really care about them.
+      </p>
+      <div class="quote-card">
+        Where children are not safe with their families, they must experience a loving home.
+      </div>
+      <div class="think-box">
+        <div class="think-box-title">💭 Your turn!</div>
+        <p style="margin-bottom: 12px;">What 3 things make a place feel like a HOME to you? Tap any that fit:</p>
+        <div class="choice-grid">
+          <button class="choice" onclick="toggleChoice(this, 'care', 'Feeling safe')">🛡️ Feeling safe</button>
+          <button class="choice" onclick="toggleChoice(this, 'care', 'Being listened to')">👂 Being listened to</button>
+          <button class="choice" onclick="toggleChoice(this, 'care', 'Having my own space')">🛏️ My own space</button>
+          <button class="choice" onclick="toggleChoice(this, 'care', 'Pets or animals')">🐾 Pets or animals</button>
+          <button class="choice" onclick="toggleChoice(this, 'care', 'Good food')">🍝 Good food</button>
+          <button class="choice" onclick="toggleChoice(this, 'care', 'Hugs')">🤗 Hugs</button>
+          <button class="choice" onclick="toggleChoice(this, 'care', 'Fun together')">🎲 Fun together</button>
+          <button class="choice" onclick="toggleChoice(this, 'care', 'Quiet time')">📚 Quiet time</button>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-sun" onclick="completeFoundation(2)">I've finished this stop! ⭐</button>
+      </div>
+    </div>
+
+    <!-- SCENE 6: PEOPLE -->
+    <div class="scene-content" id="scene-6">
+      <div class="foundation-header">
+        <div class="foundation-emoji" style="background: #C8E6C9;">🤝</div>
+        <div>
+          <span class="foundation-tag">Foundation 4 of 5</span>
+          <h2 class="foundation-title" style="color: var(--mint);">People</h2>
+        </div>
+      </div>
+      <p class="foundation-text">
+        The grown-ups who care for children should be <strong>kind, well-trained and supported</strong>. Teachers, social workers, carers — all the helpers — need to be brilliant at their jobs and care deeply.
+      </p>
+      <div class="quote-card">
+        The children Scotland cares for must be supported to develop relationships with people in the workforce and the wider community.
+      </div>
+      <div class="think-box">
+        <div class="think-box-title">💭 Your turn!</div>
+        <p style="margin-bottom: 12px;">Think of a grown-up who is GREAT at their job with kids. What makes them so good?</p>
+        <div class="choice-grid">
+          <button class="choice" onclick="toggleChoice(this, 'people', 'They listen')">👂 They actually listen</button>
+          <button class="choice" onclick="toggleChoice(this, 'people', 'They are funny')">😄 They are funny</button>
+          <button class="choice" onclick="toggleChoice(this, 'people', 'They are kind')">💝 They are kind</button>
+          <button class="choice" onclick="toggleChoice(this, 'people', 'They believe me')">✅ They believe me</button>
+          <button class="choice" onclick="toggleChoice(this, 'people', 'They keep promises')">🤞 They keep promises</button>
+          <button class="choice" onclick="toggleChoice(this, 'people', 'They are patient')">🌱 They are patient</button>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-mint" onclick="completeFoundation(3)">I've finished this stop! ⭐</button>
+      </div>
+    </div>
+
+    <!-- SCENE 7: SCAFFOLDING -->
+    <div class="scene-content" id="scene-7">
+      <div class="foundation-header">
+        <div class="foundation-emoji" style="background: #B3E5FC;">🏗️</div>
+        <div>
+          <span class="foundation-tag">Foundation 5 of 5</span>
+          <h2 class="foundation-title" style="color: var(--teal);">Scaffolding</h2>
+        </div>
+      </div>
+      <p class="foundation-text">
+        "Scaffolding" is a funny word — it means all the <strong>help and support around you</strong>, like the bars that hold up a building. Schools, doctors, social workers, clubs — they should ALL be ready to help when needed.
+      </p>
+      <div class="quote-card">
+        Children, families and the workforce must be supported by a system that is there when it is needed.
+      </div>
+      <div class="think-box">
+        <div class="think-box-title">💭 Your turn!</div>
+        <p style="margin-bottom: 12px;">Imagine you could ADD one new thing to your school, town or neighbourhood that would help kids. What would it be?</p>
+        <textarea id="scaffoldingText" placeholder="A bigger park? A homework helper? A safe space to chill? Anything!"></textarea>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-teal" onclick="completeFoundation(4)">I've finished this stop! ⭐</button>
+      </div>
+    </div>
+
+    <!-- SCENE 8: BIG QUESTION + SUBMIT -->
+    <div class="scene-content" id="scene-8">
+      <h2 style="font-family: 'Fraunces', serif; font-size: 2.4rem; text-align: center; margin-bottom: 8px;">🎉 You did it, <span id="greetName2" style="color: var(--berry);"></span>!</h2>
+      <p style="text-align: center; margin-bottom: 24px;">All 5 stickers collected. One last big question before we celebrate...</p>
+      
+      <div class="think-box" style="background: linear-gradient(135deg, #FFE5B4 0%, #FFCDD2 100%);">
+        <div class="think-box-title">🌟 The Big Question</div>
+        <p style="margin-bottom: 12px; font-size: 1.1rem;"><strong>If you could change ONE thing</strong> to make Scotland a better place to grow up, what would it be?</p>
+        <textarea id="bigText" placeholder="Anything you like! Big or small, silly or serious..." style="min-height: 120px;"></textarea>
+      </div>
+
+      <div class="think-box" style="background: white; border-style: solid;">
+        <div class="think-box-title">🎂 How old are you? <em style="font-weight: 400; font-size: 0.9rem;">(Optional)</em></div>
+        <div class="choice-grid">
+          <button class="choice" onclick="pickChoice(this, 'age', 'Under 8')">Under 8</button>
+          <button class="choice" onclick="pickChoice(this, 'age', '8-9')">8 or 9</button>
+          <button class="choice" onclick="pickChoice(this, 'age', '10-11')">10 or 11</button>
+          <button class="choice" onclick="pickChoice(this, 'age', '12+')">12 or older</button>
+        </div>
+      </div>
+
+      <p style="font-size: 0.95rem; line-height: 1.5; text-align: center; padding: 16px; background: var(--cream); border-radius: 12px; margin: 16px 0;">
+        🔒 Your answers help grown-ups make Scotland better for kids. We don't ask for your address, school or anything that could identify you. <strong>Make sure a trusted adult is OK with you sharing your answers.</strong>
+      </p>
+
+      <div class="btn-row">
+        <button class="btn btn-berry" id="submitBtn" onclick="submitForm()">Send My Answers! 🚀</button>
+        <button class="btn" style="background: white; color: var(--ink);" onclick="skipSubmit()">Skip & finish</button>
+      </div>
+    </div>
+
+    <!-- SCENE 9: FINISH / CERTIFICATE -->
+    <div class="scene-content" id="scene-9">
+      <h2 style="font-family: 'Fraunces', serif; font-size: 2.5rem; text-align: center; color: var(--berry);">🌈 Quest Complete!</h2>
+      
+      <div class="certificate">
+        <div class="cert-corner cert-corner-tl"></div>
+        <div class="cert-corner cert-corner-tr"></div>
+        <div class="cert-corner cert-corner-bl"></div>
+        <div class="cert-corner cert-corner-br"></div>
+        <p style="font-family: 'Fraunces', serif; font-size: 1.3rem;">This certifies that</p>
+        <div class="cert-name" id="certName">Friend</div>
+        <p style="font-family: 'Fraunces', serif; font-size: 1.3rem;">is a <strong>Promise Keeper</strong> who learned about</p>
+        <div class="sticker-row" style="margin-top: 16px;">
+          <span class="sticker">📣 Voice</span>
+          <span class="sticker">👨‍👩‍👧 Family</span>
+          <span class="sticker">💛 Care</span>
+          <span class="sticker">🤝 People</span>
+          <span class="sticker">🏗️ Scaffolding</span>
+        </div>
+        <p style="margin-top: 16px; font-size: 0.95rem;">Scotland's Promise to children & young people</p>
+      </div>
+
+      <p style="text-align: center; font-size: 1.05rem; margin: 16px 0;">
+        Want to learn more? Visit <a href="https://thepromise.scot" target="_blank" style="color: var(--coral); font-weight: 800;">thepromise.scot</a> with a grown-up.
+      </p>
+
+      <div class="btn-row">
+        <button class="btn btn-coral" onclick="window.print()">🖨️ Print my certificate</button>
+        <button class="btn btn-mint" onclick="restart()">🔁 Play again</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // ============================================================
+  // CONFIG: Replace with your Formspree endpoint, or leave blank
+  // to download the answers as a JSON file instead.
+  // 1. Sign up free at https://formspree.io
+  // 2. Create a new form, copy the endpoint URL
+  // 3. Paste it below
+  // ============================================================
+  const FORMSPREE_ENDPOINT = ""; // e.g. "https://formspree.io/f/xxxxxxxx"
+
+  // State
+  let currentScene = 0;
+  let foundationIndex = 0;
+  const totalScenes = 10;
+  const answers = {
+    name: "",
+    age: "",
+    voice_listen: "",
+    voice_text: "",
+    family_text: "",
+    care_home: [],
+    people_great: [],
+    scaffolding_text: "",
+    big_change: "",
+    timestamp: "",
+    version: "younger-children"
+  };
+  const stickers = [];
+  const stickerNames = ["📣 Voice", "👨‍👩‍👧 Family", "💛 Care", "🤝 People", "🏗️ Scaffolding"];
+
+  function goToScene(n) {
+    document.querySelectorAll('.scene-content').forEach(s => s.classList.remove('active'));
+    document.getElementById('scene-' + n).classList.add('active');
+    currentScene = n;
+    updateProgress();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function updateProgress() {
+    const pct = (currentScene / (totalScenes - 1)) * 100;
+    document.getElementById('progressFill').style.width = pct + '%';
+  }
+
+  function saveNameAndGo() {
+    const n = document.getElementById('userName').value.trim();
+    answers.name = n || "Friend";
+    document.getElementById('greetName').textContent = answers.name;
+    document.getElementById('greetName2').textContent = answers.name;
+    document.getElementById('certName').textContent = answers.name;
+    goToScene(2);
+  }
+
+  function startFoundation() {
+    // Scene 3-7 are the foundations (foundationIndex 0-4)
+    goToScene(3 + foundationIndex);
+  }
+
+  function pickChoice(el, key, val) {
+    // Single-select: deselect siblings
+    el.parentNode.querySelectorAll('.choice').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    answers[mapKey(key)] = val;
+  }
+
+  function toggleChoice(el, key, val) {
+    el.classList.toggle('selected');
+    const fullKey = mapKey(key);
+    if (!Array.isArray(answers[fullKey])) answers[fullKey] = [];
+    if (el.classList.contains('selected')) {
+      if (!answers[fullKey].includes(val)) answers[fullKey].push(val);
+    } else {
+      answers[fullKey] = answers[fullKey].filter(v => v !== val);
+    }
+  }
+
+  function mapKey(key) {
+    const map = {
+      voice: 'voice_listen',
+      care: 'care_home',
+      people: 'people_great',
+      age: 'age'
+    };
+    return map[key] || key;
+  }
+
+  function completeFoundation(idx) {
+    // Capture text inputs
+    if (idx === 0) answers.voice_text = document.getElementById('voiceText').value.trim();
+    if (idx === 1) answers.family_text = document.getElementById('familyText').value.trim();
+    if (idx === 4) answers.scaffolding_text = document.getElementById('scaffoldingText').value.trim();
+
+    // Award sticker
+    if (!stickers.includes(idx)) stickers.push(idx);
+
+    // Update map
+    document.getElementById('map-stop-' + idx).classList.remove('current');
+    document.getElementById('map-stop-' + idx).classList.add('done');
+    if (idx + 1 < 5) {
+      document.getElementById('map-stop-' + (idx + 1)).classList.remove('locked');
+      document.getElementById('map-stop-' + (idx + 1)).classList.add('current');
+      foundationIndex = idx + 1;
+    }
+
+    // Render stickers
+    const row = document.getElementById('stickerRow');
+    row.innerHTML = stickers.map(i => `<span class="sticker">${stickerNames[i]}</span>`).join('');
+
+    fireConfetti();
+
+    // After 5th, go to big question
+    if (idx === 4) {
+      setTimeout(() => goToScene(8), 600);
+    } else {
+      goToScene(2);
+    }
+  }
+
+  function fireConfetti() {
+    const colors = ['#FF6B6B', '#FF8C42', '#6BCB77', '#4D96A9', '#9B5DE5', '#FFE066'];
+    for (let i = 0; i < 30; i++) {
+      const c = document.createElement('div');
+      c.className = 'confetti';
+      c.style.left = Math.random() * 100 + 'vw';
+      c.style.top = '-10px';
+      c.style.background = colors[Math.floor(Math.random() * colors.length)];
+      c.style.animationDelay = Math.random() * 0.5 + 's';
+      c.style.animationDuration = (2 + Math.random() * 2) + 's';
+      if (Math.random() > 0.5) c.style.borderRadius = '50%';
+      document.body.appendChild(c);
+      setTimeout(() => c.remove(), 4000);
+    }
+  }
+
+  async function submitForm() {
+    answers.big_change = document.getElementById('bigText').value.trim();
+    answers.timestamp = new Date().toISOString();
+
+    const btn = document.getElementById('submitBtn');
+    btn.textContent = "Sending...";
+    btn.disabled = true;
+
+    try {
+      if (FORMSPREE_ENDPOINT) {
+        const res = await fetch(FORMSPREE_ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify(answers)
+        });
+        if (!res.ok) throw new Error('Network');
+      } else {
+        // Fallback: download as JSON
+        const blob = new Blob([JSON.stringify(answers, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `promise-quest-${Date.now()}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+      fireConfetti();
+      goToScene(9);
+    } catch (e) {
+      alert("We couldn't send your answers right now. Don't worry — your quest is still complete!");
+      goToScene(9);
+    }
+  }
+
+  function skipSubmit() {
+    goToScene(9);
+  }
+
+  function restart() {
+    location.reload();
+  }
+</script>
+
+</body>
+</html>
